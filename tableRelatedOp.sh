@@ -5,11 +5,13 @@ select tableOperation in "Create table" "List existing tables" "Delete table"
 do
 case $tableOperation in
 "Create table")
+    clear
     echo "Enter table name:"
     read tableName
     if [ -z $tableName ]
-    then 
-        echo "Please enter a table name"
+    then
+	clear
+        echo "Table name can't be empty, please enter a table name"
     else
         touch $tableName.tbeng
     fi
@@ -33,7 +35,7 @@ case $tableOperation in
             clear;
         ;;
         "Back")
-            break
+            exit
         ;;
     esac
     done

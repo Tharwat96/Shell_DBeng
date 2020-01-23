@@ -4,11 +4,11 @@ do
 case $DBoperation in
 "Create Database") 
 	#Check if the parent directory for Database Engine exists, if not create one.
-	if [ ! -d "/home/$USER/DBeng" ]
+	if [ ! -d "~/DBeng" ]
 	then
-		mkdir /home/$USER/DBeng && cd /home/$USER/DBeng 
+		mkdir ~/DBeng && cd ~/DBeng 
 	else 
-		cd /home/$USER/DBeng
+		cd ~/DBeng
 	fi
 	echo "Enter the Database name:"
 	read userInput
@@ -19,10 +19,10 @@ case $DBoperation in
 	
 "List Databases") 
 	#Check if no databases exist
-	if [ ! -d "/home/$USER/DBeng" ]
+	if [ ! -d "~/DBeng" ]
 	then echo "Start by creating a Database first"
 	else 
-		cd /home/$USER/DBeng 
+		cd ~/DBeng 
 		countDir=$(ls | wc -l) #Count how many databases currently exist
 		if [ $countDir -eq 0 ]
 		then echo "Currently no databases exist, create a Database first"
@@ -37,10 +37,10 @@ case $DBoperation in
 	;;
 "Delete Database") 
 	#Check if no databases exist
-	if [ ! -d "/home/$USER/DBeng" ]
+	if [ ! -d "~/DBeng" ]
 	then echo "Start by creating a Database first"
 	else 
-		cd /home/$USER/DBeng 
+		cd ~/DBeng 
 		countDir=$(ls | wc -l) #Count how many databases currently exist
 		if [ $countDir -eq 0 ]
 		then echo "Currently no databases exist, create a Database first"
@@ -66,10 +66,10 @@ case $DBoperation in
 	;;
 "Use Database for table operations")
 	#Check if no databases exist
-	if [ ! -d "/home/$USER/DBeng" ]
+	if [ ! -d "~/DBeng" ]
 	then echo "Start by creating a Database first"
 	else 
-		cd /home/$USER/DBeng 
+		cd ~/DBeng 
 		countDir=$(ls | wc -l) #Count how many databases currently exist
 		if [ $countDir -eq 0 ]
 		then echo "Currently no databases exist, create a Database first"
