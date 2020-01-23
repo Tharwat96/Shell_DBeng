@@ -1,5 +1,5 @@
 #!/bin/bash
-select DBoperation in "Create Database" "List Databases" "Delete Database" "Table related operation"
+select DBoperation in "Create Database" "List Databases" "Delete Database" "Use Database for table operations"
 do
 case $DBoperation in
 "Create Database") 
@@ -64,7 +64,7 @@ case $DBoperation in
 		fi
 	fi
 	;;
-"Table related operation")
+"Use Database for table operations")
 	#Check if no databases exist
 	if [ ! -d "/home/$USER/DBeng" ]
 	then echo "Start by creating a Database first"
@@ -77,12 +77,13 @@ case $DBoperation in
 			echo "Select the database you want to do the operation on from the following:"
 			find . -type d -name "*.beng" -printf "%f\n"
 			read userInput 
+			export userInput
 			find . -type d -name "$userInput.beng" | grep $userInput 1> /dev/null
 			if [ ! $? -eq 0 ]
 			then echo "Please enter a correct DB name from the list"
 			else
-				cd "$userInput.beng"
-				sh /home/$USER/Desktop/tableRelatedOp.sh
+				# cd "$userInput.beng"
+				`bash tableRelatedOp.sh`
 			fi
 			
 		
