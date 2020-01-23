@@ -4,7 +4,7 @@ do
 case $DBoperation in
 "Create Database") 
 	#Check if the parent directory for Database Engine exists, if not create one.
-	if [ ! -d "~/DBeng" ]
+	if [[ ! -d ~/DBeng ]]
 	then
 		mkdir ~/DBeng && cd ~/DBeng 
 	else 
@@ -19,8 +19,9 @@ case $DBoperation in
 	
 "List Databases") 
 	#Check if no databases exist
-	if [ ! -d "~/DBeng" ]
-	then echo "Start by creating a Database first"
+	if [[ ! -d ~/DBeng ]]
+	then 
+		echo "Start by creating a Database first"
 	else 
 		cd ~/DBeng 
 		countDir=$(ls | wc -l) #Count how many databases currently exist
@@ -37,7 +38,7 @@ case $DBoperation in
 	;;
 "Delete Database") 
 	#Check if no databases exist
-	if [ ! -d "~/DBeng" ]
+	if [[ ! -d ~/DBeng  ]]
 	then echo "Start by creating a Database first"
 	else 
 		cd ~/DBeng 
@@ -66,7 +67,7 @@ case $DBoperation in
 	;;
 "Use Database for table operations")
 	#Check if no databases exist
-	if [ ! -d "~/DBeng" ]
+	if [[ ! -d ~/DBeng ]]
 	then echo "Start by creating a Database first"
 	else 
 		cd ~/DBeng 
@@ -83,7 +84,7 @@ case $DBoperation in
 			then echo "Please enter a correct DB name from the list"
 			else
 				# cd "$userInput.beng"
-				`bash tableRelatedOp.sh`
+				bash tableRelatedOp.sh
 			fi
 			
 		
