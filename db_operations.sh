@@ -83,14 +83,9 @@ case $DBoperation in
 			if [ ! $? -eq 0 ]
 			then echo "Please enter a correct DB name from the list"
 			else
-				# cd "$userInput.beng"
-				bash tableRelatedOp.sh
+				cd "$userInput.beng" && bash ~/tableRelatedOp.sh
 			fi
-			
-		
-		
 		fi
-	
 	fi
 ;;
 *) echo "Enter a valid choice from the list"
