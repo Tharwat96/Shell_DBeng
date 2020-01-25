@@ -1,4 +1,5 @@
 #!/bin/bash
+scriptDir=$(pwd)
 select DBoperation in "Create Database" "List Databases" "Delete Database" "Use Database for table operations"
 do
 case $DBoperation in
@@ -83,7 +84,7 @@ case $DBoperation in
 			if [ ! $? -eq 0 ]
 			then echo "Please enter a correct DB name from the list"
 			else
-				cd "$userInput.beng" && bash ~/tableRelatedOp.sh
+				cd "$userInput.beng" && bash "$scriptDir/tableRelatedOp.sh"
 			fi
 		fi
 	fi
