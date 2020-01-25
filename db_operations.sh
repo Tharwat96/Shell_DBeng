@@ -1,6 +1,6 @@
 #!/bin/bash
-scriptDir=$(pwd)
-select DBoperation in "Create Database" "List Databases" "Delete Database" "Use Database for table operations"
+export scriptDir=$(pwd)
+select DBoperation in "Create Database" "List Databases" "Delete Database" "Use Database for table operations" "Exit"
 do
 case $DBoperation in
 "Create Database") 
@@ -16,19 +16,18 @@ case $DBoperation in
 	setDBname="$userInput.beng" #Database name always ends with a .beng 
 	mkdir $setDBname 
 	echo "Database $setDBname created at `pwd` on `date`"	
-	;;
-	
+;;	
 "List Databases") 
 	#Check if no databases exist
 	if [[ ! -d ~/DBeng ]]
 	then 
 		echo "Start by creating a Database first"
-	else 
-		cd ~/DBeng 
+	else
+		cd ~/DBeng
 		countDir=$(ls | wc -l) #Count how many databases currently exist
 		if [ $countDir -eq 0 ]
 		then echo "Currently no databases exist, create a Database first"
-		else 
+		else
 			echo "Available Databases: $countDir"
 			#List all the directories ending with .beng
 			#-printf changes find behavior, instead of outputing
@@ -36,7 +35,7 @@ case $DBoperation in
 			find . -type d -name "*.beng" -printf "%f\n"
 		fi
 	fi
-	;;
+;;
 "Delete Database") 
 	#Check if no databases exist
 	if [[ ! -d ~/DBeng  ]]
@@ -65,7 +64,7 @@ case $DBoperation in
 			fi
 		fi
 	fi
-	;;
+;;
 "Use Database for table operations")
 	#Check if no databases exist
 	if [[ ! -d ~/DBeng ]]
@@ -79,7 +78,6 @@ case $DBoperation in
 			echo "Select the database you want to do the operation on from the following:"
 			find . -type d -name "*.beng" -printf "%f\n"
 			read userInput 
-			export userInput
 			find . -type d -name "$userInput.beng" | grep $userInput 1> /dev/null
 			if [ ! $? -eq 0 ]
 			then echo "Please enter a correct DB name from the list"
@@ -88,6 +86,9 @@ case $DBoperation in
 			fi
 		fi
 	fi
+;;
+"Exit")
+	exit
 ;;
 *) echo "Enter a valid choice from the list"
 esac 

@@ -1,5 +1,5 @@
 #!/bin/bash
-# exported variable:
+# exported variables: $scriptDir
 DBname=$(basename $(pwd)) #basename returns the last / directory from the pwd command (in our case the DB name)
 clear
 id=0;
@@ -14,9 +14,9 @@ case $tableOperation in
     then
         echo "Table name can't be empty, please enter a table name"
     else
-    echo "$(pwd)/$tableName"
-        if [[ -f "$(pwd)/$tableName" ]]; 
-        # Should check if table is already created
+        echo "$(pwd)/$tableName"
+        if [[ -f "$(pwd)/$tableName.tbeng" ]]; 
+        # checks if table is already created
         then
             clear
             echo "This table is already created."
@@ -44,8 +44,7 @@ case $tableOperation in
             echo "${id}" > ~/id.var #replace the id value with the incremented value.
         fi
     fi
-    ;;
-
+;;
 "List tables")
         #Check if the directory contains no tables
         #Count how many .tbeng files currently exist
@@ -59,8 +58,7 @@ case $tableOperation in
         fi
 ;;
 "Delete table")
-    echo -e "*CAUTION ADVISED: This operation can't be undone
-    Choose a table to remove:\n"
+    echo -e "*CAUTION ADVISED: This operation can't be undone\nChoose a table to remove:\n"
     unset options i
     while IFS= read -r -d $'\0' fileName; do
         options[i++]="$fileName"
@@ -84,6 +82,17 @@ case $tableOperation in
 "Modify table")
     echo "select the table by typing its name: "
     #List ops
+    echo "Select a table you want to do an operation on from the following:"
+    find . -type f -name "*.tbeng" -printf "%f\n"
+    unset userInput && read userInput 
+    find . -type f -name "$userInput.tbeng" | grep $userInput 1> /dev/null
+    if [ ! $? -eq 0 ]
+    then echo "Please enter a correct DB name from the list"
+    else
+        export selectedTable="$userInput.tbeng"
+        bash "$scriptDir/tableModification.sh"
+    fi
+
     echo -e "1-Insert\n";
     echo "Enter data type followed by column name: ";
 
