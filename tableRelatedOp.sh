@@ -2,7 +2,8 @@
 # exported variable:
 DBname=$(basename $(pwd)) #basename returns the last / directory from the pwd command (in our case the DB name)
 clear
-select tableOperation in "Create table" "List tables" "Delete table" "Go back to database menu"
+id=0;
+select tableOperation in "Create table" "List tables" "Delete table" "Modify table" "Go back to database menu"
 do
 case $tableOperation in
 "Create table")
@@ -23,6 +24,24 @@ case $tableOperation in
             clear
             touch "$tableName.tbeng"
             echo "Table $tableName created at $(pwd) on $(date)"
+
+            echo -e "Enter column names [Separate each column name with a space]\n"
+            #Primary key handling
+            #resource used ==> https://stackoverflow.com/questions/9904980/variable-in-bash-script-that-keeps-it-value-from-the-last-time-running
+            if [ ! -f "~/id.var" ]; then #if the id file isn't present
+                id=1;
+            else 
+                id=`cat ~/id.var` #assign the id variable the value found in the id.var file
+            fi
+
+            read columnInput;
+            columnInputArray=($columnInput) #convert the input into array to iterate over the spaces
+            for column in "${columnInputArray[@]}"
+            do echo -e "$column:\c" >> $tableName.tbeng # \c for continuous text concatination (changing the default echo \n behavior)
+            done
+            echo -e "$id" >> $tableName.tbeng  #append the id to the .tbeng file
+            id=`expr ${id} + 1` #increment the id
+            echo "${id}" > ~/id.var #replace the id value with the incremented value.
         fi
     fi
     ;;
@@ -61,9 +80,19 @@ case $tableOperation in
     esac
     done
 ;;
+
+"Modify table")
+    echo "select the table by typing its name: "
+    #List ops
+    echo -e "1-Insert\n";
+    echo "Enter data type followed by column name: ";
+
+;;
+
 "Go back to database menu")
     exit
 ;;
+
 *)
 echo "Enter a valid input"
 esac
