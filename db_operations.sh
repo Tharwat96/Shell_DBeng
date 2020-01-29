@@ -7,7 +7,7 @@ function mainMenu() {
 	then whiptail --title "Welcome to the DBeng project." --msgbox "Start by creating a Database" 8 45
 	fi
 
-    dbOperations=$(whiptail --title "DBeng main Menu" --fb --menu "Choose an option" 15 60 6 \
+    dbOperations=$(whiptail --cancel-button "Exit" --title "DBeng main Menu" --fb --menu "Choose an option" 15 60 6 \
         "1" "Create Database" \
         "2" "List Existing Databases" \
 		"3" "Delete Database" \
@@ -24,8 +24,13 @@ function mainMenu() {
 
 		userInput=$(whiptail --inputbox "Enter the name of your Database:" 10 80 --title "Enter DB name"  3>&1 1>&2 2>&3)
 		setDBname="$userInput.beng" #Database name always ends with a .beng 
-		mkdir $setDBname 
-		whiptail --ok-button Done --msgbox "Database $setDBname created at `pwd` on `date`" 10 80 #10 = Heigjt 80 = Width
+		if [[ ! -d ~/DBeng/$setDBname ]]
+		then 
+			mkdir $setDBname 
+			whiptail --ok-button Done --msgbox "Database $setDBname created at `pwd` on `date`" 10 80 #10 = Height 80 = Width
+		else
+			whiptail --ok-button Done --msgbox "Database $setDBname already exists." 10 80 #10 = Height 80 = Width
+		fi
         ;;
 
         2) #List Databases		
@@ -102,94 +107,94 @@ function mainMenu() {
 		;;
 
 		5) exit
-		esac
-
-		mainMenu
+	esac
+	mainMenu
+		
 }
 
 mainMenu
 
 
-select DBoperation in "Create Database" "List Databases" "Delete Database" "Use Database for table operations" "Exit"
-do
+# select DBoperation in "Create Database" "List Databases" "Delete Database" "Use Database for table operations" "Exit"
+# do
 
-case $DBoperation in
-"Create Database") createDB
-;;	
+# case $DBoperation in
+# "Create Database") createDB
+# ;;	
 
-"List Databases") 
-	#Check if no databases exist
-	if [[ ! -d ~/DBeng ]]
-	then 
-		echo "Start by creating a Database first"
-	else
-		cd ~/DBeng
-		countDir=$(ls | wc -l) #Count how many databases currently exist
-		if [ $countDir -eq 0 ]
-		then echo "Currently no databases exist, create a Database first"
-		else
-			echo "Available Databases: $countDir"
-			#List all the directories ending with .beng
-			#-printf changes find behavior, instead of outputing
-			#./directoryName this makes it output just directoryName
-			find . -type d -name "*.beng" -printf "%f\n"
-		fi
-	fi
-;;
-"Delete Database") 
-	#Check if no databases exist
-	if [[ ! -d ~/DBeng  ]]
-	then echo "Start by creating a Database first"
-	else 
-		cd ~/DBeng 
-		countDir=$(ls | wc -l) #Count how many databases currently exist
-		if [ $countDir -eq 0 ]
-		then echo "Currently no databases exist, create a Database first"
-		else
-			echo "Enter the name of the Database to be deleted:"
-			read userInput
-			#find if the database exist or not, grep is used to give the correct
-			#return code as find always returns 0 "Success" even if the directory doesn't exist
-			# 1> redirection hides the find command ouptput "./$userInput"
-			find . -type d -name "$userInput.beng" | grep $userInput 1> /dev/null
-			if [ ! $? -eq 0 ]
-			then echo "No database named \"$userInput\" was found!!"
-			else 
-				rm -rf "$userInput.beng" 
-				if [ $? -eq 0 ]
-				then echo "Database $userInput.beng was removed at `date`"
-				else
-					echo "An error occured during deletion"
-				fi
-			fi
-		fi
-	fi
-;;
-"Use Database for table operations")
-	#Check if no databases exist
-	if [[ ! -d ~/DBeng ]]
-	then echo "Start by creating a Database first"
-	else 
-		cd ~/DBeng 
-		countDir=$(ls | wc -l) #Count how many databases currently exist
-		if [ $countDir -eq 0 ]
-		then echo "Currently no databases exist, create a Database first"
-		else
-			echo "Select the database you want to do the operation on from the following:"
-			find . -type d -name "*.beng" -printf "%f\n"
-			read userInput 
-			find . -type d -name "$userInput.beng" | grep $userInput 1> /dev/null
-			if [ ! $? -eq 0 ]
-			then echo "Please enter a correct DB name from the list"
-			else
-				cd "$userInput.beng" && bash "$scriptDir/tableRelatedOp.sh"
-			fi
-		fi
-	fi
-;;
-"Exit")
-	exit
-;;
-*) echo "Enter a valid choice from the list"
-esac 
-done
+# "List Databases") 
+# 	#Check if no databases exist
+# 	if [[ ! -d ~/DBeng ]]
+# 	then 
+# 		echo "Start by creating a Database first"
+# 	else
+# 		cd ~/DBeng
+# 		countDir=$(ls | wc -l) #Count how many databases currently exist
+# 		if [ $countDir -eq 0 ]
+# 		then echo "Currently no databases exist, create a Database first"
+# 		else
+# 			echo "Available Databases: $countDir"
+# 			#List all the directories ending with .beng
+# 			#-printf changes find behavior, instead of outputing
+# 			#./directoryName this makes it output just directoryName
+# 			find . -type d -name "*.beng" -printf "%f\n"
+# 		fi
+# 	fi
+# ;;
+# "Delete Database") 
+# 	#Check if no databases exist
+# 	if [[ ! -d ~/DBeng  ]]
+# 	then echo "Start by creating a Database first"
+# 	else 
+# 		cd ~/DBeng 
+# 		countDir=$(ls | wc -l) #Count how many databases currently exist
+# 		if [ $countDir -eq 0 ]
+# 		then echo "Currently no databases exist, create a Database first"
+# 		else
+# 			echo "Enter the name of the Database to be deleted:"
+# 			read userInput
+# 			#find if the database exist or not, grep is used to give the correct
+# 			#return code as find always returns 0 "Success" even if the directory doesn't exist
+# 			# 1> redirection hides the find command ouptput "./$userInput"
+# 			find . -type d -name "$userInput.beng" | grep $userInput 1> /dev/null
+# 			if [ ! $? -eq 0 ]
+# 			then echo "No database named \"$userInput\" was found!!"
+# 			else 
+# 				rm -rf "$userInput.beng" 
+# 				if [ $? -eq 0 ]
+# 				then echo "Database $userInput.beng was removed at `date`"
+# 				else
+# 					echo "An error occured during deletion"
+# 				fi
+# 			fi
+# 		fi
+# 	fi
+# ;;
+# "Use Database for table operations")
+# 	#Check if no databases exist
+# 	if [[ ! -d ~/DBeng ]]
+# 	then echo "Start by creating a Database first"
+# 	else 
+# 		cd ~/DBeng 
+# 		countDir=$(ls | wc -l) #Count how many databases currently exist
+# 		if [ $countDir -eq 0 ]
+# 		then echo "Currently no databases exist, create a Database first"
+# 		else
+# 			echo "Select the database you want to do the operation on from the following:"
+# 			find . -type d -name "*.beng" -printf "%f\n"
+# 			read userInput 
+# 			find . -type d -name "$userInput.beng" | grep $userInput 1> /dev/null
+# 			if [ ! $? -eq 0 ]
+# 			then echo "Please enter a correct DB name from the list"
+# 			else
+# 				cd "$userInput.beng" && bash "$scriptDir/tableRelatedOp.sh"
+# 			fi
+# 		fi
+# 	fi
+# ;;
+# "Exit")
+# 	exit
+# ;;
+# *) echo "Enter a valid choice from the list"
+# esac 
+# done
