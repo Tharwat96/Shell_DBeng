@@ -1,6 +1,5 @@
 #!/bin/bash
 export scriptDir=$(pwd)
-
 function mainMenu() {
 	#Display welcome on first time use of the engine.
 	if [[ ! -d ~/DBeng ]]
@@ -18,7 +17,8 @@ function mainMenu() {
         1) #Create Database
 		#Check if the parent directory for Database Engine exists, if not create one.
 		if [[ ! -d ~/DBeng ]]
-		then mkdir ~/DBeng && cd ~/DBeng 
+        then
+            mkdir ~/DBeng && cd ~/DBeng 
 		else cd ~/DBeng
 		fi
 
