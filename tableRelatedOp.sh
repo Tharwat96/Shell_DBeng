@@ -24,26 +24,49 @@ case $tableOperation in
             clear
             touch "$tableName.tbeng"
             echo "Table $tableName created at $(pwd) on $(date)"
-            echo -e "Enter column names [Separate each column name with a space]\n"
-            read columnInput;
-            echo -e "Enter data type of each column (string | numbers) [Separate each column name with a space]\n"
-            read typeInput;     #TODO check each data type entered to be valid
-            ############writing data types##########
-            echo -e "id\c" >> $tableName.tbeng #insert id column at start of row
-            typeInputArray=($typeInput) #convert the input into array to iterate over the spaces
-            for column in "${typeInputArray[@]}"
-            do 
-                echo -e ":$column\c" >> $tableName.tbeng # \c for continuous text concatination (changing the default echo \n behavior)
+            flag=1
+            while [ $flag -eq 1 ]
+            do
+                echo -e "Enter column names [Separate each column name with a space]\n"
+                read columnInput;
+                echo -e "Enter data type of each column (string | numbers) [Separate each column name with a space]\n"
+                read typeInput;
+                columnNF=$(echo $columnInput | awk '{print NF}')
+                typeNF=$(echo $typeInput | awk '{print NF}')
+                if [[ $columnNF -ne $typeNF ]];
+                then
+                    echo "Number of data types is not equivalent to the number of columns needed, kindly retry."
+                    continue
+                else
+                    ############validating data types#######
+                    for ((i = 0 ; i < $typeNF ; i++)); 
+                    do
+                        field=$(awk -v typeInput="$typeInput" -v i="$i" '{print i " " typeInput}' $selectedTable) ##BUGGED
+                        echo field
+                    done
+                    ############writing data types##########
+                    echo -e "id\c" >> $tableName.tbeng #insert id column at start of row
+                    typeInputArray=($typeInput) #convert the input into array to iterate over the spaces
+                    for column in "${typeInputArray[@]}"
+                    do
+                        echo -e ":$column\c" >> $tableName.tbeng # \c for continuous text concatination (changing the default echo \n behavior)
+                    done
+                    echo "" >> $tableName.tbeng #do echo default behaviour of exiting line
+                    ############writing column names#########
+                    echo -e "id\c" >> $tableName.tbeng #insert id column at start of row
+                    columnInputArray=($columnInput) #convert the input into array to iterate over the spaces
+                    for column in "${columnInputArray[@]}"
+                    do 
+                        echo -e ":$column\c" >> $tableName.tbeng # \c for continuous text concatination (changing the default echo \n behavior)
+                    done
+                    echo "" >> $tableName.tbeng #do echo default behaviour of exiting line
+
+
+                    flag=0  #change flag to go out of loop, need to be enter the final condition when done
+                fi
             done
-            echo "" >> $tableName.tbeng #do echo default behaviour of exiting line
-            ############writing column names#########
-            echo -e "id\c" >> $tableName.tbeng #insert id column at start of row
-            columnInputArray=($columnInput) #convert the input into array to iterate over the spaces
-            for column in "${columnInputArray[@]}"
-            do 
-                echo -e ":$column\c" >> $tableName.tbeng # \c for continuous text concatination (changing the default echo \n behavior)
-            done
-            echo "" >> $tableName.tbeng #do echo default behaviour of exiting line
+                 #TODO check each data type entered to be valid
+            
         fi
     fi
 ;;
