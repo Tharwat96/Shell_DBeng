@@ -1,9 +1,10 @@
 #!/bin/bash
 export scriptDir=$(pwd)
+source ./tableOuterOperation.sh
 function mainMenu() {
 	#Display welcome on first time use of the engine.
 	if [[ ! -d ~/DBeng ]]
-	then whiptail --title "Welcome to the DBeng project." --msgbox "Start by creating a Database" 8 45
+	then whiptail --title "Welcome to the DBeng project" --msgbox "Hello there,\nseems like this is the your first time using this project\nStart by creating a Database" 12 48
 	fi
 
     dbOperations=$(whiptail --cancel-button "Exit" --title "DBeng main Menu" --fb --menu "Choose an option" 15 60 6 \
@@ -61,7 +62,7 @@ function mainMenu() {
 			if [ $countDir -eq 0 ]
 			then whiptail --title "No databases exist in ~/DBeng" --msgbox "Create a Database first" 8 45
 			else
-				userInput=$(whiptail --inputbox "Enter the name of the Database to be deleted:" 10 80 --title "Delete Database"  3>&1 1>&2 2>&3)
+				userInput=$(whiptail --inputbox "Enter the name of the Database to be deleted\nCurrent available DBs are:\n `find . -type d -name "*.beng" -printf "%f\n"`" 20 80 --title "Delete Database"  3>&1 1>&2 2>&3)
 
 				#find if the database exist or not, grep is used to give the correct
 				#return code as find always returns 0 "Success" even if the directory doesn't exist
@@ -93,15 +94,13 @@ function mainMenu() {
 			countDir=$(ls | wc -l) #Count how many databases currently exist
 			if [ $countDir -eq 0 ]
 			then whiptail --title "No databases exist in ~/DBeng" --msgbox "Create a Database first" 8 45
-			else userInput=$(whiptail --inputbox "Enter the name of the Database from the list\n `find . -type d -name "*.beng" -printf "%f\n"` " 10 80 --title "Table Operation"  3>&1 1>&2 2>&3)
+			else userInput=$(whiptail --inputbox "Enter the name of the Database from the list\n `find . -type d -name "*.beng" -printf "%f\n"` " 15 80 --title "Table Operation"  3>&1 1>&2 2>&3)
 			#check if the name of the user input already exist
 			find . -type d -name "$userInput.beng" | grep $userInput 1> /dev/null
 			if [ ! $? -eq 0 ] #if it doesn't exist, prompt an error
-				then whiptail --title "Database name mismatch" --msgbox "no Database named $userInput found." 8 45
-				else whiptail --title "Cding" --msgbox "Good, now cding" 8 45
+			then whiptail --title "Database name mismatch" --msgbox "no Database named $userInput found." 8 45
+			else cd "$userInput.beng" && tableOuterOperation
 				fi
-
-				#userInput=$(whiptail --inputbox "Enter the name of the Database to be deleted:" 10 80 --title "Delete Database"  3>&1 1>&2 2>&3)
 			fi 
 		fi
 		;;
