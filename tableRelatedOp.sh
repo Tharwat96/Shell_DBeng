@@ -3,7 +3,7 @@
 DBname=$(basename $(pwd)) #basename returns the last / directory from the pwd command (in our case the DB name)
 clear
 id=0;
-select tableOperation in "Create table" "List tables" "Delete table" "Modify table" "Go back to database menu"
+select tableOperation in "Create table" "List tables" "Print table" "Delete table" "Modify table" "Go back to database menu"
 do
 case $tableOperation in
 "Create table")
@@ -46,16 +46,20 @@ case $tableOperation in
     fi
 ;;
 "List tables")
-        #Check if the directory contains no tables
-        #Count how many .tbeng files currently exist
-        countTables=$(ls | egrep '\.tbeng$' | wc -l) 
-        
-		if [ $countTables -eq 0 ]
-        then 
-            echo "$DBname doesn't contain any tables, create a table first"
-        else
-            find . -type f -name "*.tbeng" -printf "%f\n" | cut -f1 -d.
-        fi
+    #Check if the directory contains no tables
+    #Count how many .tbeng files currently exist
+    countTables=$(ls | egrep '\.tbeng$' | wc -l) 
+    
+    if [ $countTables -eq 0 ]
+    then 
+        echo "$DBname doesn't contain any tables, create a table first"
+    else
+        find . -type f -name "*.tbeng" -printf "%f\n" | cut -f1 -d.
+    fi
+;;
+"Print table")
+    #TODO
+    #awk 'BEGIN {FS=":";OFS="\t"} {if(NR == 1){exit}} END{i=1;while(i<=NF){printf $i "  "; i++;}print"\n"}' newtable.tbeng
 ;;
 "Delete table")
     echo -e "*CAUTION ADVISED: This operation can't be undone\nChoose a table to remove:\n"
