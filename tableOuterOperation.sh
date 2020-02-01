@@ -1,5 +1,8 @@
+source ./tableInnerOperation.sh
 
 function tableOuterOperation() {
+	id=0;
+
  	outerOperation=$(whiptail --cancel-button "Exit" --title "Outer table operation main Menu" --fb --menu "Choose an option" 15 60 6 \
         "1" "Create table" \
         "2" "List tables" \
@@ -16,23 +19,40 @@ function tableOuterOperation() {
 	then whiptail --title "Table already exist" --msgbox "Currently there's already a table named $userInput.tbeng in this Database." 8 45
 	else touch "$userInput.tbeng"
 		whiptail --title "Table created successfully" --msgbox "Table $userInput was created at $(pwd) on $(date)" 10 55
-		headerInput=$(whiptail --inputbox "Enter column names\nSeparate each column name with a space" 15 80 --title "Define table columns"  3>&1 1>&2 2>&3)
+		flag=1
+		while [ $flag -eq 1 ]
+		do 
+		columnInput=$(whiptail --inputbox "Enter column names\nSeparate each column name with a space" 15 80 --title "Define table columns"  3>&1 1>&2 2>&3)
+		typeInput=$(whiptail --inputbox "Enter data type of each column (String | numbers)\nSeparate each column name with a space" 15 80 --title "Define table data types"  3>&1 1>&2 2>&3)
 
-		#Handling empty user input.
-		while [ -z "$headerInput"] 
-		do whiptail --title "Input can't be empty" --msgbox "Please enter a valid input." 10 55
-		headerInput=$(whiptail --inputbox "Enter column names\nSeparate each column name with a space" 15 80 --title "Define table columns"  3>&1 1>&2 2>&3)
+		#count number of fields entered in columnInput & typeInput
+		columnNF=$(echo $columnInput | awk '{print NF}')
+		typeNF=$(echo $typeInput | awk '{print NF}')
 
-		#convert the input into array to iterate over the spaces
-		headerInputArray=($columnInput) 
+		if [[ $columnNF -ne $typeNF ]]; #if number of fields enetered don't match.
+		then whiptail --title "Number of fields don't match!" --msgbox "Number of columns entered doesn't match with the number of data types." 10 55
+		continue
+		else echo -e "id\c" >> $userInput.tbeng #insert id column at the beginning of the row.
+
+		typeInputArray=($typeInput) #convert the input into array to iterate over the spaces.
+		for column in "${typeInputArray[@]}"
+		do echo -e ":$column\c" >> $userInput.tbeng #\c for continuous text concatenation (changing the default echo \n behavior)
+		done 
+		echo "" >> $userInput.tbeng  #do echo <default behaviour of exiting line> ==> aka \n
+
+        echo -e "id\c" >> $userInput.tbeng #insert id column at start of row
+		columnInputArray=($columnInput) #convert the input into array and iterate over the spaces.
 		for column in "${columnInputArray[@]}"
-            do echo -e "$column:\c" >> $tableName.tbeng # \c for continuous text concatination (changing the default echo \n behavior)
-            done
-		done
+		do echo -e ":$column\c" >> $userInput.tbeng 
+		done 
+		echo "" >> $userInput.tbeng
 
+		whiptail --title "Success" --msgbox "Table header was initialized at `date`" 8 45
+		flag=0 #get out of the loop
+		fi 
+		done 
 	fi 
 	;;
-
 
 	2) #List tables
 	   #Check if no tables currently exist in the database first.
@@ -74,12 +94,13 @@ function tableOuterOperation() {
 	   then whiptail --title "No tables found!" --msgbox "This database currently has no existing tables." 10 55
 
 	   else 
-	   		userInput=$(whiptail --inputbox "Enter the name of the Table to be modified\nCurrent available Tables are:\n `find . -name "*.tbeng" -printf "%f\n"`" 20 80 --title "Modify Table"  3>&1 1>&2 2>&3)
+	   		userInput=$(whiptail --inputbox "Enter the name of the Table to be modified\nCurrent available Tables are:\n`find . -name "*.tbeng" -printf "%f\n"`" 20 80 --title "Modify Table"  3>&1 1>&2 2>&3)
 			find . -name "$userInput.tbeng" | grep $userInput 1> /dev/null
 			if [ ! $? -eq 0 ]
 				then whiptail --title "Table doesn't exist" --msgbox "No Table named $userInput found." 8 45
 				else 
-					whiptail --title "Modding" --msgbox "Modding" 8 45
+					export selectedTable="$userInput.tbeng"
+					tableInnerOperation
 			fi
 	   fi
 
