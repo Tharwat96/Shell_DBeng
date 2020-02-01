@@ -39,11 +39,11 @@ case $tableOperation in
                     continue
                 else
                     ############validating data types#######
-                    for ((i = 0 ; i < $typeNF ; i++)); 
-                    do
-                        field=$(awk -v typeInput="$typeInput" -v i="$i" '{print i " " typeInput}' $selectedTable) ##BUGGED
-                        echo field
-                    done
+                    # for ((i = 0 ; i < $typeNF ; i++)); 
+                    # do
+                    #     field=$(awk -v typeInput="$typeInput" -v i="$i" '{print i " " typeInput}' $selectedTable) ##BUGGED
+                    #     echo field
+                    # done
                     ############writing data types##########
                     echo -e "id\c" >> $tableName.tbeng #insert id column at start of row
                     typeInputArray=($typeInput) #convert the input into array to iterate over the spaces

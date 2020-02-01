@@ -11,6 +11,8 @@ case $tableModifications in
     ;;
     "Insert Data")
         # TODO -condition if field is empty -condition if doesn't match types entered
+        echo -e "Enter fields [Separate each field with a space]\n"
+        awk 'BEGIN {FS=":";OFS="\t"} {if(NR == 3){exit} i=2;while(i<=NF){printf $i "\t"; i++;} printf"\n"}' $selectedTable
         read rowInput;
         if [ -z "$rowInput" ]  # Check if string is empty using -z
         then
@@ -19,8 +21,6 @@ case $tableModifications in
         else
             oldId=$(awk -F : 'END{printf $1}' $selectedTable) #assign id of final row in table
             id=$((oldId + 1))
-            echo -e "Enter fields [Separate each field with a space]\n"
-            awk 'BEGIN {FS=":";OFS="\t"} {if(NR == 3){exit} i=2;while(i<=NF){printf $i "\t"; i++;} printf"\n"}' $selectedTable
             echo -e "$id\c" >> $selectedTable
             rowInputArray=($rowInput) #convert the input into array to iterate over the spaces
             for row in "${rowInputArray[@]}"
