@@ -25,33 +25,41 @@ function tableInnerOperation() {
                 if [ -z "$rowInput" ]  # Check if string is empty using -z
                 then whiptail --title "Input is empty" --scrolltext --msgbox  "Row can't be empty, please enter row data to continue" 16 65
                 else
-                    oldId=$(awk -F : 'END{printf $1}' $selectedTable) #assign id of final row in table
-                    id=$((oldId+1))
-                    echo "id:$id oldId:$oldId"
-                    newRow=$(echo -e "$id\c")
-                    rowInputArray=($rowInput) #convert the input into array to iterate over the spaces
-                    i=1
-                    for field in "${rowInputArray[@]}"
-                    do
-                        currentDataType=$(awk -F : -v i=$((i + 1)) '{if(NR==1){exit}} END{print $i}' "$selectedTable")
-                        if [[ $currentDataType == "numbers" ]]
-                        then
-                            numRegex='^[0-9]+$'
-                            if ! [[ $field =~ $numRegex ]] ; then
-                                whiptail --title "Validation failed" --msgbox "$field is not a number" 8 45
-                                flag=0
-                            fi
-                        fi
-                        tmp=$(echo -e ":$field\c") # \c for continuous text concatination (changing the default echo \n behavior)
-                        i=$((i+1))
-                    done
-                    #Need to check if record was inserted successfully before displaying the message but echo alwasy returns a zero!
-                    tmp=$(echo "")
-                    newRow="$newRow$tmp"
-                    if [ $flag -eq 1 ]
+                    #count number of fields entered
+                    tableNF=$(awk -F : '{if(NR==1){exit}} END{print NF-1}' "$selectedTable")
+                    inputNF=$(echo $rowInput | awk '{print NF}')
+                    if [[ $inputNF -ne $tableNF ]]; #if number of fields enetered don't match.
                     then
-                        echo -e $newRow >> $selectedTable # \c for continuous text concatination (changing the default echo \n behavior)
-                        whiptail --title "Record inserted" --msgbox  "The record was added to table $selectedTable successfully" 16 65
+                        whiptail --title "Number of fields don't match!" --msgbox "Number of columns entered doesn't match with the number of data types." 10 55
+                        flag=0
+                    else
+                        oldId=$(awk -F : 'END{printf $1}' $selectedTable) #assign id of final row in table
+                        id=$((oldId+1))
+                        newRow=$(echo -e "$id\c")
+                        rowInputArray=($rowInput) #convert the input into array to iterate over the spaces
+                        i=1
+                        for field in "${rowInputArray[@]}"
+                        do
+                            currentDataType=$(awk -F : -v i=$((i + 1)) '{if(NR==1){exit}} END{print $i}' "$selectedTable")
+                            if [[ $currentDataType == "numbers" ]]
+                            then
+                                numRegex='^[0-9]+$'
+                                if ! [[ $field =~ $numRegex ]] ; then
+                                    whiptail --title "Validation failed" --msgbox "$field is not a number" 8 45
+                                    flag=0
+                                fi
+                            fi
+                            tmp=$(echo -e ":$field\c") # \c for continuous text concatination (changing the default echo \n behavior)
+                            i=$((i+1))
+                        done
+                        #Need to check if record was inserted successfully before displaying the message but echo alwasy returns a zero!
+                        tmp=$(echo "")
+                        newRow="$newRow$tmp"
+                        if [ $flag -eq 1 ]
+                        then
+                            echo -e $newRow >> $selectedTable # \c for continuous text concatination (changing the default echo \n behavior)
+                            whiptail --title "Record inserted" --msgbox  "The record was added to table $selectedTable successfully" 16 65
+                        fi
                     fi
                 fi
             fi
@@ -73,29 +81,38 @@ function tableInnerOperation() {
                     if [ -z "$updatedRow" ] #Handle empty input
                     then whiptail --title "Error" --msgbox  "The input can't be left empty, please enter a valid input or use the delete option if you want to delete" 16 65
                     else
-                        rowInputArray=($updatedRow) #convert the input into array to iterate over the spaces
-                        updatedRow=$(echo $updatedRow | awk -v OFS=":" '{$1=$1; print}')
-                        flag=1
-                        i=1
-                        for field in "${rowInputArray[@]}"
-                        do
-                            currentDataType=$(awk -F : -v i=$((i + 1)) '{if(NR==1){exit}} END{print $i}' "$selectedTable")
-                            if [[ $currentDataType == "numbers" ]]
-                            then
-                                numRegex='^[0-9]+$'
-                                if ! [[ $field =~ $numRegex ]] ; then
-                                    flag=0
-                                fi
-                            fi
-                            tmp=$(echo -e ":$field\c") # \c for continuous text concatenation (changing the default echo \n behavior)
-                            i=$((i+1))
-                        done
-                        if [ $flag -eq 1 ] # flag=1 => if everything is ok, flag=0 => something is not right
+                        #count number of fields entered and check if they match with table header
+                        tableNF=$(awk -F : '{if(NR==1){exit}} END{print NF-1}' "$selectedTable")
+                        inputNF=$(echo $updatedRow | awk '{print NF}')
+                        if [[ $inputNF -ne $tableNF ]]; #if number of fields enetered don't match.
                         then
-                            awk -F : -v rowNum=$NR -v input=$updatedRow '{if(NR==rowNum){$0=$1":"input}print}' $selectedTable > tmpfile && mv tmpfile $selectedTable #replace the old record with the new one
-                            whiptail --title "Record updated" --msgbox  "The record was updated successfully" 16 65
+                            echo "inputNF:$inputNF tableNF:$tableNF"
+                            whiptail --title "Number of fields don't match!" --msgbox "Number of fields entered doesn't match with the number of table columns." 10 55
+                            flag=0
                         else
-                            whiptail --title "Validation failed" --msgbox "$field is not a number" 8 45
+                            rowInputArray=($updatedRow) #convert the input into array to iterate over the spaces
+                            updatedRow=$(echo $updatedRow | awk -v OFS=":" '{$1=$1; print}')
+                            flag=1
+                            i=1
+                            for field in "${rowInputArray[@]}"
+                            do
+                                currentDataType=$(awk -F : -v i=$((i + 1)) '{if(NR==1){exit}} END{print $i}' "$selectedTable")
+                                if [[ $currentDataType == "numbers" ]]
+                                then
+                                    numRegex='^[0-9]+$'
+                                    if ! [[ $field =~ $numRegex ]] ; then
+                                        whiptail --title "Validation failed" --msgbox "$field is not a number" 8 45
+                                        flag=0
+                                    fi
+                                fi
+                                tmp=$(echo -e ":$field\c") # \c for continuous text concatenation (changing the default echo \n behavior)
+                                i=$((i+1))
+                            done
+                            if [ $flag -eq 1 ] # flag=1 => everything is ok, flag=0 => something is not right
+                            then
+                                awk -F : -v rowNum=$NR -v input=$updatedRow '{if(NR==rowNum){$0=$1":"input}print}' $selectedTable > tmpfile && mv tmpfile $selectedTable #replace the old record with the new one
+                                whiptail --title "Record updated" --msgbox  "The record was updated successfully" 16 65
+                            fi
                         fi
                     fi
                 fi
