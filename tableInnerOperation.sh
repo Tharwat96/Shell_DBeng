@@ -1,7 +1,7 @@
 function tableInnerOperation() {
     id=0;
     
-    innerOperation=$(whiptail --cancel-button "Exit" --title "Inner table operation main Menu" --fb --menu "Choose an option" 15 60 6 \
+    innerOperation=$(whiptail --cancel-button "Exit" --title "Inner table operation menu" --fb --menu "Choose an option" 15 60 6 \
         "1" "Display Records" \
         "2" "Insert Record" \
         "3" "Update Record" \
@@ -86,7 +86,6 @@ function tableInnerOperation() {
                         inputNF=$(echo $updatedRow | awk '{print NF}')
                         if [[ $inputNF -ne $tableNF ]]; #if number of fields enetered don't match.
                         then
-                            echo "inputNF:$inputNF tableNF:$tableNF"
                             whiptail --title "Number of fields don't match!" --msgbox "Number of fields entered doesn't match with the number of table columns." 10 55
                             flag=0
                         else

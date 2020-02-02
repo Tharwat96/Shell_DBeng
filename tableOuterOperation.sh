@@ -3,12 +3,12 @@ dataTypesSupported=('string' 'numbers')
 function tableOuterOperation() {
     id=0;
     
-    outerOperation=$(whiptail --cancel-button "Exit" --title "Outer table operation main Menu" --fb --menu "Choose an option" 15 60 6 \
+    outerOperation=$(whiptail --cancel-button "Exit" --title "Outer table operation menu" --fb --menu "Choose an option" 15 60 6 \
         "1" "Create table" \
         "2" "List tables" \
         "3" "Delete table" \
         "4" "Modify table [Inner operation]" \
-    "5" "Go back to DBeng Main menu" 3>&1 1>&2 2>&3)
+    "5" "Go back to DBeng main menu" 3>&1 1>&2 2>&3)
     exitstatus=$?
     [[ "$exitstatus" = 1 ]] && exit;	#test if exit button is pressed
     
@@ -111,16 +111,20 @@ function tableOuterOperation() {
             then whiptail --title "No tables found!" --msgbox "This database currently has no existing tables." 10 55
                 
             else
-                userInput=$(whiptail --inputbox "Enter the name of the Table to be deleted\nCurrent available Tables are:\n `find . -name "*.tbeng" -printf "%f\n"`" 20 80 --title "Delete Table"  3>&1 1>&2 2>&3)
-                find . -name "$userInput.tbeng" | grep $userInput 1> /dev/null
-                if [ ! $? -eq 0 ]
-                then whiptail --title "Table doesn't exist" --msgbox "No Table named $userInput found." 8 45
-                else
-                    rm -rf "$userInput.tbeng"
-                    if [ $? -eq 0 ]
-                    then  whiptail --title "Table Successfully removed" --msgbox "Table $userInput.tbeng was removed at `date`" 8 45
+                userInput=$(whiptail --inputbox "Enter the name of the Table to be deleted\nCurrent available Tables are:\n`find . -name "*.tbeng" -printf "%f\n" | cut -f1 -d .`" 20 80 --title "Delete Table"  3>&1 1>&2 2>&3)
+                exitstatus=$?	#test if cancel button is pressed	if existstatus == 1 then it is pressed
+                if [[ "$exitstatus" = 0 ]]
+                then
+                    find . -name "$userInput.tbeng" | grep $userInput 1> /dev/null
+                    if [ ! $? -eq 0 ]
+                    then whiptail --title "Table doesn't exist" --msgbox "No Table named $userInput found." 8 45
                     else
-                        whiptail --title "Unknown error occured" --msgbox "For some reason we were unable to remove $userInput Table" 8 45
+                        rm -rf "$userInput.tbeng"
+                        if [ $? -eq 0 ]
+                        then  whiptail --title "Table Successfully removed" --msgbox "Table $userInput.tbeng was removed at `date`" 8 45
+                        else
+                            whiptail --title "Unknown error occured" --msgbox "For some reason we were unable to remove $userInput Table" 8 45
+                        fi
                     fi
                 fi
             fi
@@ -133,7 +137,7 @@ function tableOuterOperation() {
             then whiptail --title "No tables found!" --msgbox "This database currently has no existing tables." 10 55
                 
             else
-                userInput=$(whiptail --inputbox "Enter the name of the Table to be modified\nCurrent available Tables are:\n`find . -name "*.tbeng" -printf "%f\n"`" 20 80 --title "Modify Table"  3>&1 1>&2 2>&3)
+                userInput=$(whiptail --inputbox "Enter the name of the Table to be modified\nCurrent available Tables are:\n`find . -name "*.tbeng" -printf "%f\n" | cut -f1 -d .`" 20 80 --title "Modify Table"  3>&1 1>&2 2>&3)
                 exitstatus=$?	#test if cancel button is pressed	if existstatus == 1 then it is pressed
                 if [[ "$exitstatus" = 0 ]]
                 then
