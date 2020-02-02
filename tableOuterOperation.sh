@@ -1,5 +1,5 @@
 source ./tableInnerOperation.sh
-
+dataTypesSupported=('string' 'numbers')
 function tableOuterOperation() {
     id=0;
     
@@ -33,7 +33,7 @@ function tableOuterOperation() {
                     do
                         columnInput=$(whiptail --inputbox "Enter column names\nSeparate each column name with a space" 15 80 --title "Define table columns"  3>&1 1>&2 2>&3)
                         exitstatus=$?	#test if cancel button is pressed	if existstatus == 1 then it is pressed
-                        if [[ "$exitstatus" = 1 ]]
+                        if [[ "$exitstatus" = 1 ]] #handle cancel button press
                         then
                             rm "$newTable.tbeng"
                             whiptail --title "Table creation cancelled" --msgbox "Table $newTable was removed upon your cancellation." 10 55
@@ -58,20 +58,35 @@ function tableOuterOperation() {
                         else echo -e "id\c" >> $userInput.tbeng #insert id column at the beginning of the row.
                             
                             typeInputArray=($typeInput) #convert the input into array to iterate over the spaces.
-                            for column in "${typeInputArray[@]}"
-                            do echo -e ":$column\c" >> $userInput.tbeng #\c for continuous text concatenation (changing the default echo \n behavior)
+                            for type in "${typeInputArray[@]}"
+                            do
+                                if [[ ! " ${dataTypesSupported[@]} " =~ " ${type} " ]]; then
+                                    # when the type entered is not in our typesSupported array
+                                    echo "entered1"
+                                    flag=0
+                                fi
+                                echo -e ":$type\c" >> $userInput.tbeng #\c for continuous text concatenation (changing the default echo \n behavior)
                             done
                             echo "" >> $userInput.tbeng  #do echo <default behaviour of exiting line> ==> aka \n
                             
                             echo -e "id\c" >> $userInput.tbeng #insert id column at start of row
                             columnInputArray=($columnInput) #convert the input into array and iterate over the spaces.
                             for column in "${columnInputArray[@]}"
-                            do echo -e ":$column\c" >> $userInput.tbeng
+                            do
+                                echo -e ":$column\c" >> $userInput.tbeng
                             done
                             echo "" >> $userInput.tbeng
-                            
-                            whiptail --title "Success" --msgbox "Table header was initialized at `date`" 8 45
-                            flag=0 #get out of the loop
+                            if [ $flag -eq 0 ]
+                            #if a condition above marked the flag as 0 then a corruption happened and data will not be written and the loop must again
+                            then
+                                # empties contents of file for a new loop by redirecting null (nothing) and shows error
+                                > $userInput.tbeng && whiptail --title "Invalid datatype" --msgbox "Invalid datatype entered, please try again." 10 55
+                                flag=1	#resets the flag to retake inputs from user
+                                echo "entered2"
+                            else # case of success and all conditions passed
+                                whiptail --title "Success" --msgbox "Table header was initialized at `date`" 8 45
+                                flag=0 #get out of the loop
+                            fi
                         fi
                     done
                 fi

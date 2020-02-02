@@ -2,7 +2,7 @@ function tableInnerOperation() {
     id=0;
     
     innerOperation=$(whiptail --cancel-button "Exit" --title "Inner table operation main Menu" --fb --menu "Choose an option" 15 60 6 \
-        "1" "Dislay Records" \
+        "1" "Display Records" \
         "2" "Insert Record" \
         "3" "Update Record" \
         "4" "Delete Record" \
