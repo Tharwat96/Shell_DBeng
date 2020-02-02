@@ -119,12 +119,16 @@ function tableOuterOperation() {
                 
             else
                 userInput=$(whiptail --inputbox "Enter the name of the Table to be modified\nCurrent available Tables are:\n`find . -name "*.tbeng" -printf "%f\n"`" 20 80 --title "Modify Table"  3>&1 1>&2 2>&3)
-                find . -name "$userInput.tbeng" | grep $userInput 1> /dev/null
-                if [ ! $? -eq 0 ]
-                then whiptail --title "Table doesn't exist" --msgbox "No Table named $userInput found." 8 45
-                else
-                    export selectedTable="$userInput.tbeng"
-                    tableInnerOperation
+                exitstatus=$?	#test if cancel button is pressed	if existstatus == 1 then it is pressed
+                if [[ "$exitstatus" = 0 ]]
+                then
+                    find . -name "$userInput.tbeng" | grep $userInput 1> /dev/null
+                    if [ ! $? -eq 0 ]
+                    then whiptail --title "Table doesn't exist" --msgbox "No Table named $userInput found." 8 45
+                    else
+                        export selectedTable="$userInput.tbeng"
+                        tableInnerOperation
+                    fi
                 fi
             fi
             
