@@ -24,13 +24,17 @@ function mainMenu() {
 		fi
 
 		userInput=$(whiptail --inputbox "Enter the name of your Database:" 10 80 --title "Enter DB name"  3>&1 1>&2 2>&3)
-		setDBname="$userInput.beng" #Database name always ends with a .beng 
-		if [[ ! -d ~/DBeng/$setDBname ]]
-		then 
-			mkdir $setDBname 
-			whiptail --ok-button Done --msgbox "Database $setDBname created at `pwd` on `date`" 10 80 #10 = Height 80 = Width
-		else
-			whiptail --ok-button Done --msgbox "Database $setDBname already exists." 10 80 #10 = Height 80 = Width
+		if [ -z "$userInput" ] #Handle empty input
+		then whiptail --ok-button Done --msgbox "Input can't be empty" 10 80 #10 = Height 80 = Width
+		else 
+			setDBname="$userInput.beng" #Database name always ends with a .beng 
+			if [[ ! -d ~/DBeng/$setDBname ]]
+			then 
+				mkdir $setDBname 
+				whiptail --ok-button Done --msgbox "Database $setDBname created at `pwd` on `date`" 10 80 #10 = Height 80 = Width
+			else
+				whiptail --ok-button Done --msgbox "Database $setDBname already exists." 10 80 #10 = Height 80 = Width
+			fi
 		fi
         ;;
 
@@ -45,7 +49,7 @@ function mainMenu() {
 			if [ $countDir -eq 0 ]
 			then whiptail --title "No databases exist in ~/DBeng" --msgbox "No databases to list" 8 45
 			else
-				whiptail --title "Found $countDir Databases" --msgbox "`find . -type d -name "*.beng" -printf "%f\n"`" 8 45
+				whiptail --title "Found $countDir Databases" --scrolltext --msgbox "`find . -type d -name "*.beng" -printf "%f\n"`" 12 45
 				#List all the directories ending with .beng
 				#-printf changes find behavior, instead of outputing
 				#./directoryName this makes it output just directoryName
