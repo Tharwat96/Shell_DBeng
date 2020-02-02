@@ -24,20 +24,20 @@ function mainMenu() {
                 mkdir ~/DBeng && cd ~/DBeng
             else cd ~/DBeng
             fi
-            userInput=$(whiptail --inputbox "Enter the name of your Database:" 10 80 --title "Enter DB name"  3>&1 1>&2 2>&3)
+            userInput=$(whiptail --inputbox "Enter the name of your Database:" 15 60 --title "Enter DB name"  3>&1 1>&2 2>&3)
             exitstatus=$?	#test if cancel button is pressed	if existstatus == 1 then it is pressed
             if [[ "$exitstatus" = 0 ]]
             then
                 if [ -z "$userInput" ] #Handle empty input
-                then whiptail --ok-button Done --msgbox "Database name cannot be empty, please try again." 10 80 #10 = Height 80 = Width
+                then whiptail --ok-button Done --msgbox "Database name cannot be empty, please try again." 15 60 #10 = Height 80 = Width
                 else
                     setDBname="$userInput.beng" #Database name always ends with a .beng
                     if [[ ! -d ~/DBeng/$setDBname ]] #if there is no directory with the same name
                     then
                         mkdir $setDBname
-                        whiptail --ok-button Done --msgbox "Database $setDBname created at `pwd` on `date`" 10 80 #10 = Height 80 = Width
+                        whiptail --ok-button Done --msgbox "Database $setDBname created at `pwd` on `date`" 15 60 #10 = Height 80 = Width
                     else
-                        whiptail --ok-button Done --msgbox "Database $setDBname already exists." 10 80 #10 = Height 80 = Width
+                        whiptail --ok-button Done --msgbox "Database $setDBname already exists." 15 60 #10 = Height 80 = Width
                     fi
                 fi
             fi
@@ -54,7 +54,7 @@ function mainMenu() {
                 if [ $countDir -eq 0 ]
                 then whiptail --title "No databases exist in ~/DBeng" --msgbox "No databases to list" 8 45
                 else
-                    whiptail --title "Found $countDir Databases" --scrolltext --msgbox "`find . -type d -name "*.beng" -printf "%f\n"`" 12 45
+                    whiptail --title "Found $countDir Databases" --scrolltext --msgbox "`find . -type d -name "*.beng" -printf "%f\n"`" 15 60
                     #List all the directories ending with .beng
                     #-printf changes find behavior, instead of outputing
                     #./directoryName this makes it output just directoryName
@@ -71,7 +71,7 @@ function mainMenu() {
                 if [ $countDir -eq 0 ]
                 then whiptail --title "No databases exist in ~/DBeng" --msgbox "Create a Database first" 8 45
                 else
-                    userInput=$(whiptail --inputbox "Enter the name of the Database to be deleted\nCurrent available DBs are:\n `find . -type d -name "*.beng" -printf "%f\n"`" 20 80 --title "Delete Database"  3>&1 1>&2 2>&3)
+                    userInput=$(whiptail --scrolltext --inputbox "Enter the name of the Database to be deleted\n*Name is case sensitive\nCurrent available DBs are:\n`find . -type d -name "*.beng" -printf "%f\n"`" 15 60 --title "Delete Database"  3>&1 1>&2 2>&3)
                     exitstatus=$?	#test if cancel button is pressed	if existstatus == 1 then it is pressed
                     if [[ "$exitstatus" = 0 ]]
                     then
@@ -107,13 +107,13 @@ function mainMenu() {
                 if [ $countDir -eq 0 ]
                 then whiptail --title "No databases exist in ~/DBeng" --msgbox "Create a Database first" 8 45
                 else
-                    userInput=$(whiptail --inputbox "Enter the name of the Database from the list\n `find . -type d -name "*.beng" -printf "%f\n"` " 15 80 --title "Table Operation"  3>&1 1>&2 2>&3)
+                    userInput=$(whiptail --scrolltext --inputbox "Enter the name of the Database from the list\n*Name is case sensitive\n`find . -type d -name "*.beng" -printf "%f\n"` " 15 60 --title "Table Operation"  3>&1 1>&2 2>&3)
                     exitstatus=$?	#test if cancel button is pressed	if existstatus == 1 then it is pressed
                     if [[ "$exitstatus" = 0 ]]
                     then
                         if [ -z "$userInput" ] #checks if empty input
                         then
-                            whiptail --ok-button Done --msgbox "No input found, please try again." 10 80 #10 = Height 80 = Width
+                            whiptail --ok-button Done --msgbox "No input found, please try again." 8 45 #8 = Height 45 = Width
                         else
                             #check if the name of the user input already exist
                             find . -type d -name "$userInput.beng" | grep $userInput 1> /dev/null #throws stdout to null so it don't output

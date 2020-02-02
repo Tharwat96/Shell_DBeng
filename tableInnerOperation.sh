@@ -67,12 +67,14 @@ function tableInnerOperation() {
                 updatedRow=$(whiptail --inputbox "" 20 80 --title "Update Record" $row  3>&1 1>&2 2>&3) #display the record in the input line
                 updatedRow=$(echo $updatedRow | awk -v OFS=":" '{$1=$1; print}')
                 
-                #######FIX###########
-                #NO CHECKING , DAYMN STATUS CODE IS SUCCESS SO IT ACCEPTS ANYTHING EMPTY!!
-                awk -F : -v rowNum=$NR -v input=$updatedRow '{if(NR==rowNum){$0=$1":"input}print}' $selectedTable > tmpfile && mv tmpfile $selectedTable #replace the old record with the new one
-                if [ $? -eq 0 ]
-                then whiptail --title "Record Updated" --msgbox  "The record was updated Successfully" 16 65
-                else whiptail --title "Error" --msgbox  "Something went terribly wrong in during the update process!" 16 65
+                if [ -z "$updatedRow" ] #Handle empty input
+                then whiptail --title "Error" --msgbox  "The input can't be left empty, please enter a valid input." 16 65
+                else 
+                    awk -F : -v rowNum=$NR -v input=$updatedRow '{if(NR==rowNum){$0=$1":"input}print}' $selectedTable > tmpfile && mv tmpfile $selectedTable #replace the old record with the new one
+                    if [ $? -eq 0 ]
+                    then whiptail --title "Record Updated" --msgbox  "The record was updated Successfully" 16 65
+                    else whiptail --title "Error" --msgbox  "Something went terribly wrong in during the update process!" 16 65
+                    fi
                 fi
             fi
         ;;
