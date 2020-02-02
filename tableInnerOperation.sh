@@ -17,22 +17,42 @@ function tableInnerOperation() {
         ;;
         
         2) #Insert Record
+            flag=1
             rowInput=$(whiptail --inputbox "Enter fields for this record:\n`awk 'BEGIN {FS=":";OFS="\t"} {if(NR == 3){exit} i=2;while(i<=NF){printf $i "\t"; i++;} printf"\n"}' $selectedTable`" 20 80 --title "Insert Record"  3>&1 1>&2 2>&3)
             exitstatus=$?	#test if cancel button is pressed	if existstatus == 1 then it is pressed
             if [[ "$exitstatus" = 0 ]]
             then
                 if [ -z "$rowInput" ]  # Check if string is empty using -z
                 then whiptail --title "Input is empty" --scrolltext --msgbox  "Row can't be empty, please enter row data to continue" 16 65
-                else  oldId=$(awk -F : 'END{printf $1}' $selectedTable) #assign id of final row in table
-                    id=$((oldId + 1))
-                    echo -e "$id\c" >> $selectedTable
+                else
+                    oldId=$(awk -F : 'END{printf $1}' $selectedTable) #assign id of final row in table
+                    id=$((oldId+1))
+                    echo "id:$id oldId:$oldId"
+                    newRow=$(echo -e "$id\c")
                     rowInputArray=($rowInput) #convert the input into array to iterate over the spaces
-                    for row in "${rowInputArray[@]}"
-                    do echo -e ":$row\c" >> $selectedTable # \c for continuous text concatination (changing the default echo \n behavior)
+                    i=1
+                    for field in "${rowInputArray[@]}"
+                    do
+                        currentDataType=$(awk -F : -v i=$((i + 1)) '{if(NR==1){exit}} END{print $i}' "$selectedTable")
+                        if [[ $currentDataType == "numbers" ]]
+                        then
+                            numRegex='^[0-9]+$'
+                            if ! [[ $field =~ $numRegex ]] ; then
+                                whiptail --title "Validation failed" --msgbox "$field is not a number" 8 45
+                                flag=0
+                            fi
+                        fi
+                        tmp=$(echo -e ":$field\c") # \c for continuous text concatination (changing the default echo \n behavior)
+                        i=$((i+1))
                     done
                     #Need to check if record was inserted successfully before displaying the message but echo alwasy returns a zero!
-                    whiptail --title "Record inserted" --msgbox  "The record was added to table $selectedTable successfully" 16 65
-                    echo "" >> $selectedTable
+                    tmp=$(echo "")
+                    newRow="$newRow$tmp"
+                    if [ $flag -eq 1 ]
+                    then
+                        echo -e $newRow >> $selectedTable # \c for continuous text concatination (changing the default echo \n behavior)
+                        whiptail --title "Record inserted" --msgbox  "The record was added to table $selectedTable successfully" 16 65
+                    fi
                 fi
             fi
         ;;
