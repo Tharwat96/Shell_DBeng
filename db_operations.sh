@@ -24,18 +24,21 @@ function mainMenu() {
                 mkdir ~/DBeng && cd ~/DBeng
             else cd ~/DBeng
             fi
-            
             userInput=$(whiptail --inputbox "Enter the name of your Database:" 10 80 --title "Enter DB name"  3>&1 1>&2 2>&3)
-            if [ -z "$userInput" ] #Handle empty input
-            then whiptail --ok-button Done --msgbox "Database name cannot be empty, please try again." 10 80 #10 = Height 80 = Width
-            else
-                setDBname="$userInput.beng" #Database name always ends with a .beng
-                if [[ ! -d ~/DBeng/$setDBname ]] #if there is no directory with the same name
-                then
-                    mkdir $setDBname
-                    whiptail --ok-button Done --msgbox "Database $setDBname created at `pwd` on `date`" 10 80 #10 = Height 80 = Width
+            exitstatus=$?	#test if cancel button is pressed	if existstatus == 1 then it is pressed
+            if [[ "$exitstatus" = 0 ]]
+            then
+                if [ -z "$userInput" ] #Handle empty input
+                then whiptail --ok-button Done --msgbox "Database name cannot be empty, please try again." 10 80 #10 = Height 80 = Width
                 else
-                    whiptail --ok-button Done --msgbox "Database $setDBname already exists." 10 80 #10 = Height 80 = Width
+                    setDBname="$userInput.beng" #Database name always ends with a .beng
+                    if [[ ! -d ~/DBeng/$setDBname ]] #if there is no directory with the same name
+                    then
+                        mkdir $setDBname
+                        whiptail --ok-button Done --msgbox "Database $setDBname created at `pwd` on `date`" 10 80 #10 = Height 80 = Width
+                    else
+                        whiptail --ok-button Done --msgbox "Database $setDBname already exists." 10 80 #10 = Height 80 = Width
+                    fi
                 fi
             fi
         ;;
@@ -69,23 +72,26 @@ function mainMenu() {
                 then whiptail --title "No databases exist in ~/DBeng" --msgbox "Create a Database first" 8 45
                 else
                     userInput=$(whiptail --inputbox "Enter the name of the Database to be deleted\nCurrent available DBs are:\n `find . -type d -name "*.beng" -printf "%f\n"`" 20 80 --title "Delete Database"  3>&1 1>&2 2>&3)
-                    
-                    #find if the database exist or not, grep is used to give the correct
-                    #return code as find always returns 0 "Success" even if the directory doesn't exist
-                    # 1> redirection hides the find command ouptput "./$userInput"
-                    find . -type d -name "$userInput.beng" | grep $userInput 1> /dev/null
-                    if [ ! $? -eq 0 ]
-                    then whiptail --title "Database doesn't exist" --msgbox "No database named $userInput found." 8 45
-                        
-                        #then echo "No database named \"$userInput\" was found!!"
-                    else
-                        rm -rf "$userInput.beng"
-                        if [ $? -eq 0 ]
-                        then  whiptail --title "Database Successfully removed" --msgbox "Database $userInput.beng was removed at `date`" 8 45
-                            #echo "Database $userInput.beng was removed at `date`"
+                    exitstatus=$?	#test if cancel button is pressed	if existstatus == 1 then it is pressed
+                    if [[ "$exitstatus" = 0 ]]
+                    then
+                        #find if the database exist or not, grep is used to give the correct
+                        #return code as find always returns 0 "Success" even if the directory doesn't exist
+                        # 1> redirection hides the find command ouptput "./$userInput"
+                        find . -type d -name "$userInput.beng" | grep $userInput 1> /dev/null
+                        if [ ! $? -eq 0 ]
+                        then whiptail --title "Database doesn't exist" --msgbox "No database named $userInput found." 8 45
+                            
+                            #then echo "No database named \"$userInput\" was found!!"
                         else
-                            whiptail --title "Unknown error occured" --msgbox "For some reason we were unable to remove $userInput database" 8 45
-                            #echo "An error occured during deletion"
+                            rm -rf "$userInput.beng"
+                            if [ $? -eq 0 ]
+                            then  whiptail --title "Database Successfully removed" --msgbox "Database $userInput.beng was removed at `date`" 8 45
+                                #echo "Database $userInput.beng was removed at `date`"
+                            else
+                                whiptail --title "Unknown error occured" --msgbox "For some reason we were unable to remove $userInput database" 8 45
+                                #echo "An error occured during deletion"
+                            fi
                         fi
                     fi
                 fi
@@ -100,12 +106,22 @@ function mainMenu() {
                 countDir=$(ls | wc -l) #Count how many databases currently exist
                 if [ $countDir -eq 0 ]
                 then whiptail --title "No databases exist in ~/DBeng" --msgbox "Create a Database first" 8 45
-                else userInput=$(whiptail --inputbox "Enter the name of the Database from the list\n `find . -type d -name "*.beng" -printf "%f\n"` " 15 80 --title "Table Operation"  3>&1 1>&2 2>&3)
-                    #check if the name of the user input already exist
-                    find . -type d -name "$userInput.beng" | grep $userInput 1> /dev/null
-                    if [ ! $? -eq 0 ] #if it doesn't exist, prompt an error
-                    then whiptail --title "Database name mismatch" --msgbox "no Database named $userInput found." 8 45
-                    else cd "$userInput.beng" && tableOuterOperation
+                else
+                    userInput=$(whiptail --inputbox "Enter the name of the Database from the list\n `find . -type d -name "*.beng" -printf "%f\n"` " 15 80 --title "Table Operation"  3>&1 1>&2 2>&3)
+                    exitstatus=$?	#test if cancel button is pressed	if existstatus == 1 then it is pressed
+                    if [[ "$exitstatus" = 0 ]]
+                    then
+                        if [ -z "$userInput" ] #checks if empty input
+                        then
+                            whiptail --ok-button Done --msgbox "No input found, please try again." 10 80 #10 = Height 80 = Width
+                        else
+                            #check if the name of the user input already exist
+                            find . -type d -name "$userInput.beng" | grep $userInput 1> /dev/null #throws stdout to null so it don't output
+                            if [ ! $? -eq 0 ] #if it doesn't exist, prompt an error
+                            then whiptail --title "Database name mismatch" --msgbox "No database named $userInput found." 8 45
+                            else cd "$userInput.beng" && tableOuterOperation
+                            fi
+                        fi
                     fi
                 fi
             fi

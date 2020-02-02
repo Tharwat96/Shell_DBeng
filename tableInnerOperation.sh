@@ -7,6 +7,9 @@ function tableInnerOperation() {
         "3" "Update Record" \
         "4" "Delete Record" \
     "5" "Go back to previous menu" 3>&1 1>&2 2>&3)
+    exitstatus=$?
+    [[ "$exitstatus" = 1 ]] && exit;	#test if exit button is pressed
+    
     
     case $innerOperation in
         1) #Display Records
