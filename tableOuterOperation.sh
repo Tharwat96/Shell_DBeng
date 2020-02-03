@@ -99,7 +99,7 @@ function tableOuterOperation() {
             countTables=$(ls | egrep '\.tbeng$' | wc -l)
             if [ $countTables -eq 0 ]
             then whiptail --title "No tables found!" --msgbox "This database currently have no existing tables." 10 55
-            else whiptail --title "Current tables list" --msgbox "Current tables in the database are:\n`find . -type f -name "*.tbeng" -printf "%f\n" | cut -f1 -d .`" 20 55
+            else whiptail --title "Current tables list" --msgbox "Current tables in the database are:\n`find . -type f -name "*.tbeng" -printf "%f\n"| rev | cut -d"." -f2-  | rev`" 20 55
             fi
         ;;
         
@@ -111,7 +111,7 @@ function tableOuterOperation() {
             then whiptail --title "No tables found!" --msgbox "This database currently has no existing tables." 10 55
                 
             else
-                userInput=$(whiptail --inputbox "Enter the name of the Table to be deleted\nCurrent available Tables are:\n`find . -name "*.tbeng" -printf "%f\n" | cut -f1 -d .`" 20 80 --title "Delete Table"  3>&1 1>&2 2>&3)
+                userInput=$(whiptail --inputbox "Enter the name of the Table to be deleted\nCurrent available Tables are:\n`find . -name "*.tbeng" -printf "%f\n"| rev | cut -d"." -f2-  | rev`" 20 80 --title "Delete Table"  3>&1 1>&2 2>&3)
                 exitstatus=$?	#test if cancel button is pressed	if existstatus == 1 then it is pressed
                 if [[ "$exitstatus" = 0 ]]
                 then
@@ -137,7 +137,7 @@ function tableOuterOperation() {
             then whiptail --title "No tables found!" --msgbox "This database currently has no existing tables." 10 55
                 
             else
-                userInput=$(whiptail --inputbox "Enter the name of the Table to be modified\nCurrent available Tables are:\n`find . -name "*.tbeng" -printf "%f\n" | cut -f1 -d .`" 20 80 --title "Modify Table"  3>&1 1>&2 2>&3)
+                userInput=$(whiptail --inputbox "Enter the name of the Table to be modified\nCurrent available Tables are:\n`find . -name "*.tbeng" -printf "%f\n"| rev | cut -d"." -f2-  | rev`" 20 80 --title "Modify Table"  3>&1 1>&2 2>&3)
                 exitstatus=$?	#test if cancel button is pressed	if existstatus == 1 then it is pressed
                 if [[ "$exitstatus" = 0 ]]
                 then

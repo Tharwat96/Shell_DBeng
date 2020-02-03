@@ -54,7 +54,7 @@ function mainMenu() {
                 if [ $countDir -eq 0 ]
                 then whiptail --title "No databases exist in ~/DBeng" --msgbox "No databases to list" 8 45
                 else
-                    whiptail --title "Found $countDir Databases" --scrolltext --msgbox "`find . -type d -name "*.beng" -printf "%f\n" | cut -f1 -d .`" 15 60
+                    whiptail --title "Found $countDir Databases" --scrolltext --msgbox "`find . -type d -name "*.beng" -printf "%f\n" | rev | cut -d"." -f2-  | rev`" 15 60
                     #List all the directories ending with .beng
                     #-printf changes find behavior, instead of outputing
                     #./directoryName this makes it output just directoryName
@@ -71,7 +71,7 @@ function mainMenu() {
                 if [ $countDir -eq 0 ]
                 then whiptail --title "No databases exist in ~/DBeng" --msgbox "Create a Database first" 8 45
                 else
-                    userInput=$(whiptail --scrolltext --inputbox "Enter the name of the Database to be deleted\n*Name is case sensitive\nCurrent available DBs are:\n`find . -type d -name "*.beng" -printf "%f\n" | cut -f1 -d .`" 15 60 --title "Delete Database"  3>&1 1>&2 2>&3)
+                    userInput=$(whiptail --scrolltext --inputbox "Enter the name of the Database to be deleted\n*Name is case sensitive\nCurrent available DBs are:\n`find . -type d -name "*.beng" -printf "%f\n"| rev | cut -d"." -f2-  | rev`" 15 60 --title "Delete Database"  3>&1 1>&2 2>&3)
                     exitstatus=$?	#test if cancel button is pressed	if existstatus == 1 then it is pressed
                     if [[ "$exitstatus" = 0 ]]
                     then
@@ -107,7 +107,7 @@ function mainMenu() {
                 if [ $countDir -eq 0 ]
                 then whiptail --title "No databases exist in ~/DBeng" --msgbox "Create a Database first" 8 45
                 else
-                    userInput=$(whiptail --scrolltext --inputbox "Enter the name of the Database from the list\n*Name is case sensitive\n`find . -type d -name "*.beng" -printf "%f\n" | cut -f1 -d .` " 15 60 --title "Table Operation"  3>&1 1>&2 2>&3)
+                    userInput=$(whiptail --scrolltext --inputbox "Enter the name of the Database from the list\n*Name is case sensitive\n`find . -type d -name "*.beng" -printf "%f\n"| rev | cut -d"." -f2-  | rev` " 15 60 --title "Table Operation"  3>&1 1>&2 2>&3)
                     exitstatus=$?	#test if cancel button is pressed	if existstatus == 1 then it is pressed
                     if [[ "$exitstatus" = 0 ]]
                     then
