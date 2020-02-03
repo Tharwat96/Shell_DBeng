@@ -8,6 +8,11 @@ The extension used for the database files is ".beng" and for the tables the exte
 ## Preview:
 [![DBeng preview](https://github.com/Tharwat96/bash_dbengine/blob/master/Whiptail_UI.png)]
 
+## Installing whiptail:
+```
+sudo apt-get update -y && sudo apt-get install -y whiptail
+```
+
 
 ## Supported operations:
 ```
@@ -22,3 +27,9 @@ The extension used for the database files is ".beng" and for the tables the exte
 ```
 
 *This project was made by CPD track students at ITI intake number 40.
+
+*You can read more about whiptail here:
+```
+https://linux.die.net/man/1/whiptail
+https://en.wikibooks.org/wiki/Bash_Shell_Scripting/Whiptail
+```
