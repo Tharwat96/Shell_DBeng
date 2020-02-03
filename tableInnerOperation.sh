@@ -123,15 +123,19 @@ function tableInnerOperation() {
             exitstatus=$?	#test if cancel button is pressed	if existstatus == 1 then it is pressed
             if [[ "$exitstatus" = 0 ]]
             then
+                #STILL NEEDS TO CHECK IF MULTIPLE INSERTIONS
                 if [ -z "$id" ]
                 then whiptail --title "Error" --msgbox  "The input can't be left empty, please enter a valid ID." 16 65
                 else
-                    
-                    #####FIX###########
-                    #NEED HANDLING / WHAT ABOUT THE INPUT WAS FALSE ID ?
-                    awk -F : -v id=$id '{if($1==id){next}print}' $selectedTable > tmpfile && mv tmpfile $selectedTable
-                    #CHECK IF PREV COMMAND WAS SUCCESSFUL THEN DISPLAY THIS
-                    whiptail --title "Success" --msgbox  "Record was deleted successfully" 16 65
+                    ids=($(awk 'BEGIN {FS=":"} NR>2{print $1}' $selectedTable))
+                    if [[ " ${ids[@]} " =~ " ${id} " ]]; then
+                        awk -F : -v id=$id '{if($1==id){next}print}' $selectedTable > tmpfile && mv tmpfile $selectedTable
+                        #CHECK IF PREV COMMAND WAS SUCCESSFUL THEN DISPLAY THIS
+                        whiptail --title "Success" --msgbox  "Record was deleted successfully" 16 65
+                        echo -e ":$type\c" >> $userInput.tbeng #\c for continuous text concatenation (changing the default echo \n behavior)
+                    else
+                        whiptail --title "Error" --msgbox  "id was not found in the table." 16 65
+                    fi
                 fi
             fi
         ;;
