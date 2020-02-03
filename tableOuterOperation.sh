@@ -39,7 +39,7 @@ function tableOuterOperation() {
                             whiptail --title "Table creation cancelled" --msgbox "Table $newTable was removed upon your cancellation." 10 55
                             flag=0 && break
                         fi
-                        typeInput=$(whiptail --inputbox "Enter data type of each column (String | numbers)\nSeparate each column name with a space" 15 80 --title "Define table data types"  3>&1 1>&2 2>&3)
+                        typeInput=$(whiptail --inputbox "Enter data type of each column (string | numbers)\nSeparate each column name with a space" 15 80 --title "Define table data types"  3>&1 1>&2 2>&3)
                         exitstatus=$?	#test if cancel button is pressed	if existstatus == 1 then it is pressed
                         if [[ "$exitstatus" = 1 ]]
                         then

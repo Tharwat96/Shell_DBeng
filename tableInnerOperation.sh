@@ -3,7 +3,7 @@ function tableInnerOperation() {
     
     innerOperation=$(whiptail --cancel-button "Exit" --title "Inner table operation menu" --fb --menu "Choose an option" 15 60 6 \
         "1" "Display records" \
-        "2" "Display specific record" \
+        "2" "Display a specific record" \
         "3" "Insert record" \
         "4" "Update record" \
         "5" "Delete record" \
@@ -59,7 +59,7 @@ function tableInnerOperation() {
                     else
                         oldId=$(awk -F : 'END{printf $1}' $selectedTable) #assign id of final row in table
                         id=$((oldId+1))
-                        newRow=$(echo -e "$id\c")                        
+                        newRow=$(echo -e "$id\c")
                         rowInputArray=($rowInput) #convert the input into array to iterate over the spaces
                         i=1
                         for field in "${rowInputArray[@]}"
@@ -74,12 +74,12 @@ function tableInnerOperation() {
                                 fi
                             fi
                             tmp=$(echo -e ":$field\c") # \c for continuous text concatination (changing the default echo \n behavior)
-                            newRow="$newRow$tmp"                            
+                            newRow="$newRow$tmp"
                             i=$((i+1))
                         done
                         #Need to check if record was inserted successfully before displaying the message but echo alwasy returns a zero!
                         tmp=$(echo "")
-                        newRow="$newRow$tmp"                        
+                        newRow="$newRow$tmp"
                         if [ $flag -eq 1 ]
                         then
                             echo -e $newRow >> $selectedTable # \c for continuous text concatination (changing the default echo \n behavior)
@@ -92,50 +92,57 @@ function tableInnerOperation() {
         
         4) #Update record
             id=$(whiptail --inputbox "Please insert the ID of the row that you want to update. " 20 80 --title "Update Record"  3>&1 1>&2 2>&3)
-            exitstatus=$?	#test if cancel button is pressed	if existstatus == 1 then it is pressed
+            exitstatus=$?	#test if cancel button is pressed if existstatus == 1 then it is pressed
             if [[ "$exitstatus" = 0 ]]
             then
-                #$1=$1 is to force rebuilding the entire record using current OFS
-                #reference: https://stackoverflow.com/questions/13704947/print-all-fields-with-awk-separated-by-ofs
-                row=$(awk -F : -v id=$id -v OFS=" " '{$1=$1;if($1==id){for(i=2; i<=NF; i++){printf $i " "}}}' $selectedTable)
-                NR=$(awk -F : -v id=$id '{if($1==id){print NR}}' $selectedTable) #get row number of the record to be edited
-                updatedRow=$(whiptail --inputbox "" 20 80 --title "Update Record" "$row"  3>&1 1>&2 2>&3) #display the record in the input line
-                exitstatus=$?	#test if cancel button is pressed	if existstatus == 1 then it is pressed
-                if [[ "$exitstatus" = 0 ]]
-                then
-                    if [ -z "$updatedRow" ] #Handle empty input
-                    then whiptail --title "Error" --msgbox  "The input can't be left empty, please enter a valid input or use the delete option if you want to delete" 16 65
-                    else
-                        #count number of fields entered and check if they match with table header
-                        tableNF=$(awk -F : '{if(NR==1){exit}} END{print NF-1}' "$selectedTable")
-                        inputNF=$(echo $updatedRow | awk '{print NF}')
-                        if [[ $inputNF -ne $tableNF ]]; #if number of fields enetered don't match.
-                        then
-                            whiptail --title "Number of fields don't match!" --msgbox "Number of fields entered doesn't match with the number of table columns." 10 55
-                            flag=0
+                idNF=($(echo $id | awk '{print NF}'))
+                if [ -z "$id" ] #Handle empty input
+                then whiptail --title "Error" --msgbox  "The input can't be left empty, please enter a valid input or use the delete option if you want to delete" 16 65
+                elif [ $idNF -gt 1 ]
+                then whiptail --title "Error" --msgbox  "The input can't be more than one, please enter just one valid ID." 16 65
+                else
+                    #$1=$1 is to force rebuilding the entire record using current OFS
+                    #reference: https://stackoverflow.com/questions/13704947/print-all-fields-with-awk-separated-by-ofs
+                    row=$(awk -F : -v id=$id -v OFS=" " '{$1=$1;if($1==id){for(i=2; i<=NF; i++){printf $i " "}}}' "$selectedTable")
+                    NR=$(awk -F : -v id=$id '{if($1==id){print NR}}' $selectedTable) #get row number of the record to be edited
+                    updatedRow=$(whiptail --inputbox "" 20 80 --title "Update Record" "$row"  3>&1 1>&2 2>&3) #display the record in the input line
+                    exitstatus=$?	#test if cancel button is pressed	if existstatus == 1 then it is pressed
+                    if [[ "$exitstatus" = 0 ]]
+                    then
+                        if [ -z "$updatedRow" ] #Handle empty input
+                        then whiptail --title "Error" --msgbox  "The input can't be left empty, please enter a valid input or use the delete option if you want to delete" 16 65
                         else
-                            rowInputArray=($updatedRow) #convert the input into array to iterate over the spaces
-                            updatedRow=$(echo $updatedRow | awk -v OFS=":" '{$1=$1; print}')
-                            flag=1
-                            i=1
-                            for field in "${rowInputArray[@]}"
-                            do
-                                currentDataType=$(awk -F : -v i=$((i + 1)) '{if(NR==1){exit}} END{print $i}' "$selectedTable")
-                                if [[ $currentDataType == "numbers" ]]
-                                then
-                                    numRegex='^[0-9]+$'
-                                    if ! [[ $field =~ $numRegex ]] ; then
-                                        whiptail --title "Validation failed" --msgbox "$field is not a number" 8 45
-                                        flag=0
-                                    fi
-                                fi
-                                tmp=$(echo -e ":$field\c") # \c for continuous text concatenation (changing the default echo \n behavior)
-                                i=$((i+1))
-                            done
-                            if [ $flag -eq 1 ] # flag=1 => everything is ok, flag=0 => something is not right
+                            #count number of fields entered and check if they match with table header
+                            tableNF=$(awk -F : '{if(NR==1){exit}} END{print NF-1}' "$selectedTable")
+                            inputNF=$(echo $updatedRow | awk '{print NF}')
+                            if [[ $inputNF -ne $tableNF ]]; #if number of fields enetered don't match.
                             then
-                                awk -F : -v rowNum=$NR -v input=$updatedRow '{if(NR==rowNum){$0=$1":"input}print}' $selectedTable > tmpfile && mv tmpfile $selectedTable #replace the old record with the new one
-                                whiptail --title "Record updated" --msgbox  "The record was updated successfully" 16 65
+                                whiptail --title "Number of fields don't match!" --msgbox "Number of fields entered doesn't match with the number of table columns." 10 55
+                                flag=0
+                            else
+                                rowInputArray=($updatedRow) #convert the input into array to iterate over the spaces
+                                updatedRow=$(echo $updatedRow | awk -v OFS=":" '{$1=$1; print}')
+                                flag=1
+                                i=1
+                                for field in "${rowInputArray[@]}"
+                                do
+                                    currentDataType=$(awk -F : -v i=$((i + 1)) '{if(NR==1){exit}} END{print $i}' "$selectedTable")
+                                    if [[ $currentDataType == "numbers" ]]
+                                    then
+                                        numRegex='^[0-9]+$'
+                                        if ! [[ $field =~ $numRegex ]] ; then
+                                            whiptail --title "Validation failed" --msgbox "$field is not a number" 8 45
+                                            flag=0
+                                        fi
+                                    fi
+                                    tmp=$(echo -e ":$field\c") # \c for continuous text concatenation (changing the default echo \n behavior)
+                                    i=$((i+1))
+                                done
+                                if [ $flag -eq 1 ] # flag=1 => everything is ok, flag=0 => something is not right
+                                then
+                                    awk -F : -v rowNum=$NR -v input=$updatedRow '{if(NR==rowNum){$0=$1":"input}print}' $selectedTable > tmpfile && mv tmpfile $selectedTable #replace the old record with the new one
+                                    whiptail --title "Record updated" --msgbox  "The record was updated successfully" 16 65
+                                fi
                             fi
                         fi
                     fi
