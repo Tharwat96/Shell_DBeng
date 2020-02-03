@@ -1,4 +1,4 @@
-# bash_dbengine
+# Shell_DBeng - Shell based database engine
 [![Open Source Love svg2](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)
 [![made-with-bash](https://img.shields.io/badge/Made%20with-Bash-1f425f.svg)](https://www.gnu.org/software/bash/)
 
@@ -7,6 +7,7 @@ The extension used for the database files is ".beng" and for the tables the exte
 
 ## Preview:
 [![DBeng preview](https://github.com/Tharwat96/bash_dbengine/blob/master/Whiptail_UI.png)]
+
 
 ## Installing whiptail:
 ```
@@ -32,4 +33,16 @@ sudo apt-get update -y && sudo apt-get install -y whiptail
 ```
 https://linux.die.net/man/1/whiptail
 https://en.wikibooks.org/wiki/Bash_Shell_Scripting/Whiptail
+```
+## Usage:
+
+1- Clone this repository or simply download as zip file and then decompress it.
+
+2- make sure to give the main script "db_main.sh" execution permission by navigating to the directory of DBeng by: 
+```
+chmod u+x db_main.sh
+```
+3- Run the main script: 
+```
+./db_main.sh
 ```
