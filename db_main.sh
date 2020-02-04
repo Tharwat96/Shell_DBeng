@@ -28,8 +28,11 @@ function mainMenu() {
             exitstatus=$?	#test if cancel button is pressed	if existstatus == 1 then it is pressed
             if [[ "$exitstatus" = 0 ]]
             then
+                inputNF=($(echo $userInput | awk '{print NF}'))
                 if [ -z "$userInput" ] #Handle empty input
                 then whiptail --ok-button Done --msgbox "Database name cannot be empty, please try again." 15 60 #10 = Height 80 = Width
+                elif [ $inputNF -gt 1 ]
+                then whiptail --title "Error" --msgbox  "The input can't be more than one, please enter just one continous valid database name." 16 65
                 else
                     setDBname="$userInput.beng" #Database name always ends with a .beng
                     if [[ ! -d ~/DBeng/$setDBname ]] #if there is no directory with the same name

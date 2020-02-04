@@ -19,9 +19,12 @@ function tableOuterOperation() {
             exitstatus=$?	#test if cancel button is pressed	if existstatus == 1 then it is pressed
             if [[ "$exitstatus" = 0 ]]
             then
+                inputNF=($(echo $userInput | awk '{print NF}'))
                 if [ -z "$userInput" ] #if input is empty
                 then
                     whiptail --title "Input can't be empty" --msgbox "Please enter a valid table name." 8 45
+                elif [ $inputNF -gt 1 ]
+                then whiptail --title "Error" --msgbox  "The input can't be more than one, please enter just one continous valid table name." 16 65
                 elif [ -f "$(pwd)/$userInput.tbeng" ] #check if the table already exists
                 then whiptail --title "Table already exist" --msgbox "Currently there's already a table named $userInput.tbeng in this Database." 8 45
                 else
